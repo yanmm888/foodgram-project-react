@@ -1,7 +1,7 @@
 # Yamdb with Docker and workflows
 ## База отзывов пользователей о фильмах, музыке и книгах
 ## Стек технологий: Python 3, Django REST Framework, PostgreSQL, Simple-JWT, NGINX, Docker, flake, pytest
-### Проект развернут на http://foodgram.ps-card.ru/admin
+### Проект развернут на http://foodgram.ps-card.ru
 ### Статус workflow: 
 ![example workflow](https://github.com/yanmm888/foodgram-project-react/actions/workflows/foodgram_workflow.yaml/badge.svg)
 ____

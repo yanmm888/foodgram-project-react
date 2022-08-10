@@ -47,7 +47,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo docker compose stop
-            sudo docker compose rm backend
+            sudo docker compose rm foodgram
             sudo docker compose rm frontend
             rm .env
             touch .env

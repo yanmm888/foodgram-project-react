@@ -20,13 +20,13 @@ ____
 ```docker-compose up```
 
 ### Выполнить миграции:
-```docker-compose exec web python manage.py makemigrations``` \
-```docker-compose exec web python manage.py migrate``` 
+```docker-compose exec backend python manage.py makemigrations``` \
+```docker-compose exec backend python manage.py migrate``` 
 
 ### Создать суперпользователя:
-```docker-compose exec web python manage.py createsuperuser```
+```docker-compose exec backend python manage.py createsuperuser```
 #### для windows 
-```winpty docker-compose exec web python manage.py createsuperuser```
+```winpty docker-compose exec backend python manage.py createsuperuser```
 
 ### Информация об образе на Dockerhub
 ```nmm888/api_yamdb```

@@ -1,3 +1,9 @@
+import base64
+import uuid
+import six
+import imghdr
+
+from django.core.files.base import ContentFile
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
@@ -9,12 +15,6 @@ from users.models import Follow, User
 class Base64ImageField(serializers.ImageField):
 
     def to_internal_value(self, data):
-        import base64
-        import uuid
-
-        import six
-        from django.core.files.base import ContentFile
-
         if isinstance(data, six.string_types):
             if 'data:' in data and ';base64,' in data:
                 header, data = data.split(';base64,')
@@ -32,8 +32,6 @@ class Base64ImageField(serializers.ImageField):
         return super(Base64ImageField, self).to_internal_value(data)
 
     def get_file_extension(self, file_name, decoded_file):
-        import imghdr
-
         extension = imghdr.what(file_name, decoded_file)
         extension = "jpg" if extension == "jpeg" else extension
 
@@ -99,7 +97,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'username', 'email', 'first_name',
             'last_name', 'is_subscribed', 'password'
         )
-        extra_kwargs = {'password' : {'write_only': True}}
+        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         validated_data['password'] = (
@@ -109,10 +107,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        if request.user.is_anonymous:
-            return False
         return (
             request.user.is_authenticated
+            and (not request.user.is_anonymous)
             and Follow.objects.filter(
                 user=request.user,
                 author__id=obj.id
@@ -149,10 +146,9 @@ class RecipeGetSerializer(serializers.ModelSerializer):
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
-        if request.user.is_anonymous:
-            return False
         return (
             request.user.is_authenticated
+            and (not request.user.is_anonymous)
             and Cart.objects.filter(
                 user=request.user,
                 recipe__id=obj.id
@@ -301,14 +297,14 @@ class FollowSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        if not request:
-            return True
         return (
-            Follow.objects.filter(
+            request.user.is_authenticated
+            and request
+            and Follow.objects.filter(
                 user=request.user,
                 author__id=obj.id
             ).exists()
-            and request.user.is_authenticated
+
         )
 
     def get_recipes(self, obj):

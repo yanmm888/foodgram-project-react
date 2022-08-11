@@ -4,6 +4,9 @@ from django.db import models
 
 class User(AbstractUser, PermissionsMixin):
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ('username', 'password')
+
     email = models.EmailField(
         verbose_name='Электронная почта',
         max_length=254,
@@ -31,9 +34,6 @@ class User(AbstractUser, PermissionsMixin):
         default=False
     )
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ('username', 'password')
-
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
@@ -41,7 +41,7 @@ class User(AbstractUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
-        
+
 
 class Follow(models.Model):
     author = models.ForeignKey(

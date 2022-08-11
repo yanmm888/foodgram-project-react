@@ -1,6 +1,5 @@
 from http import HTTPStatus
 
-from django.db import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -33,7 +32,8 @@ class FollowViewSet(viewsets.ModelViewSet):
     pagination_class = PageLimitPagination
 
     def get_queryset(self):
-        return Follow.objects.filter(user=self.request.user)
+        follower = self.request.user
+        return follower.follower.all()
 
     def create(self, request, *args, **kwargs):
         author = get_object_or_404(
@@ -45,18 +45,19 @@ class FollowViewSet(viewsets.ModelViewSet):
                 'Нельзя подписываться на себя',
                 status=HTTPStatus.BAD_REQUEST
             )
-        try:
-            Follow.objects.create(author=author, user=self.request.user)
-        except IntegrityError:
+        if not Follow.objects.filter(
+                user=request.user,
+                author=author
+                ).exists():
+            follow = Follow.objects.create(
+                author=author, user=self.request.user
+                )
+        else:
             return Response(
                 'Вы уже подписаны на данного автора',
                 status=HTTPStatus.BAD_REQUEST
             )
-        follow = get_object_or_404(
-            Follow,
-            author=author,
-            user=request.user
-        )
+
         serializer = FollowSerializer(follow, many=False)
         return Response(
             data=serializer.data,
@@ -113,7 +114,8 @@ class FavoriteViewSet(CreateDestroyViewSet):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        return Favorite.objects.filter(user=self.request.user)
+        favorites = self.request.user
+        return favorites.favorites.all()
 
     def create(self, request, *args, **kwargs):
         recipe = get_object_or_404(
@@ -158,16 +160,20 @@ class CartViewSet(viewsets.ModelViewSet):
             Recipe,
             id=self.kwargs.get('recipe_id')
         )
-        try:
+        if not Cart.objects.filter(
+                user=self.request.user,
+                recipe=recipe
+                ).exists():
             Cart.objects.create(user=self.request.user, recipe=recipe)
-        except IntegrityError:
+
+        else:
             return Response(
                 'Этот рецепт уже в списке покупок',
                 status=HTTPStatus.BAD_REQUEST
             )
         serializer = RecipeSmallSerializer(recipe, many=False)
         return Response(data=serializer.data, status=HTTPStatus.CREATED)
-    
+
     def delete(self, request, *args, **kwargs):
         recipe = get_object_or_404(
             Recipe,

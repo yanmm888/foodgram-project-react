@@ -20,7 +20,6 @@ ____
 ```docker-compose up```
 
 ### Выполнить миграции:
-```docker-compose exec backend python manage.py makemigrations``` \
 ```docker-compose exec backend python manage.py migrate``` 
 
 ### Создать суперпользователя:
@@ -28,8 +27,11 @@ ____
 #### для windows 
 ```winpty docker-compose exec backend python manage.py createsuperuser```
 
+#### Загрузка ингридиентов
+```docker-compose exec backend python manage.py load_ingredients```
+
 ### Информация об образе на Dockerhub
-```nmm888/api_yamdb```
+```nmm888/foodgram```
 ### Информация об авторе
 Malik Nurmagomedov
 ```https://github.com/yanmm888/```
